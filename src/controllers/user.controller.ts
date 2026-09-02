@@ -1,80 +1,48 @@
-import type { Request, Response } from "express";
-import type { IUser } from "../types.js";
+import type { RequestHandler } from "express";
 import userService from "../services/user.service.js";
+import type { IUser } from "../types.js";
+import type { CreateUserBody, EmptyBody, EmptyParams, EmptyQuery, IdParams, UpdateUserBody } from "../types/http.types.js";
 
-interface UserParams {
-    id: string;
-}
+const getCustomers: RequestHandler<EmptyParams, IUser[], EmptyBody, EmptyQuery> = async (_request, response, next) => {
+  try {
+    response.json(await userService.getCustomers());
+  } catch (error: unknown) {
+    next(error);
+  }
+};
 
-type UserResponse = IUser | { message: string };
-type UsersResponse = IUser[] | { message: string };
+const getCustomer: RequestHandler<IdParams, IUser, EmptyBody, EmptyQuery> = async (request, response, next) => {
+  try {
+    response.json(await userService.getCustomer(request.params.id));
+  } catch (error: unknown) {
+    next(error);
+  }
+};
 
-function getCustomers(_request: Request, response: Response<UsersResponse>): void {
-    const customers = userService.getCustomers();
-    response.json(customers);
-}
+const createCustomer: RequestHandler<EmptyParams, IUser, CreateUserBody, EmptyQuery> = async (request, response, next) => {
+  try {
+    response.status(201).json(await userService.createCustomer(request.body));
+  } catch (error: unknown) {
+    next(error);
+  }
+};
 
-function getCustomer(
-    request: Request<UserParams>,
-    response: Response<UserResponse>,
-): void {
-    const user = userService.getCustomer(request.params.id);
+const updateCustomer: RequestHandler<IdParams, IUser, UpdateUserBody, EmptyQuery> = async (request, response, next) => {
+  try {
+    response.json(await userService.updateCustomer(request.params.id, request.body));
+  } catch (error: unknown) {
+    next(error);
+  }
+};
 
-    if (!user) {
-        response.status(404).json({ message: "Usuário não encontrado" });
-        return;
-    }
-
-    response.json(user);
-}
-
-
-function createCustomer(
-    request: Request<Record<string, never>, UserResponse, unknown>,
-    response: Response<UserResponse>,
-): void {
-    const newUser = userService.createCustomer(request.body);
-
-    if (!newUser) {
-        response.status(400).json({ message: "O corpo deve conter id (number), name (string) e email (string)" });
-        return;
-    }
-
-    response.status(201).json(newUser);
-}
-
-function updateCustomer(
-    request: Request<UserParams, UserResponse, Partial<IUser>>,
-    response: Response<UserResponse>,
-): void {
-    const user = userService.updateCustomer(request.params.id, request.body);
-
-    if (!user) {
-        response.status(404).json({ message: "Usuário não encontrado" });
-        return;
-    }
-
-    response.status(200).json(user);
-}
-
-function deleteCustomer(
-    request: Request<UserParams>,
-    response: Response<{ message: string }>,
-): void {
-    const result = userService.deleteCustomer(request.params.id);
-   
-    if (result.message) {
-        response.status(404).json(result);
-        return;
-    }
-
+const deleteCustomer: RequestHandler<IdParams, void, EmptyBody, EmptyQuery> = async (request, response, next) => {
+  try {
+    await userService.deleteCustomer(request.params.id);
     response.status(204).send();
-}
+  } catch (error: unknown) {
+    next(error);
+  }
+};
 
-export default {
-    getCustomers,
-    getCustomer,
-    createCustomer,
-    updateCustomer,
-    deleteCustomer,
-}
+export default { getCustomers, getCustomer, createCustomer, updateCustomer, deleteCustomer };
+

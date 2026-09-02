@@ -1,45 +1,44 @@
 import userService from "../services/user.service.js";
-function getCustomers(_request, response) {
-    const customers = userService.getCustomers();
-    response.json(customers);
-}
-function getCustomer(request, response) {
-    const user = userService.getCustomer(request.params.id);
-    if (!user) {
-        response.status(404).json({ message: "Usuário não encontrado" });
-        return;
+const getCustomers = async (_request, response, next) => {
+    try {
+        response.json(await userService.getCustomers());
     }
-    response.json(user);
-}
-function createCustomer(request, response) {
-    const newUser = userService.createCustomer(request.body);
-    if (!newUser) {
-        response.status(400).json({ message: "O corpo deve conter id (number), name (string) e email (string)" });
-        return;
+    catch (error) {
+        next(error);
     }
-    response.status(201).json(newUser);
-}
-function updateCustomer(request, response) {
-    const user = userService.updateCustomer(request.params.id, request.body);
-    if (!user) {
-        response.status(404).json({ message: "Usuário não encontrado" });
-        return;
-    }
-    response.status(200).json(user);
-}
-function deleteCustomer(request, response) {
-    const result = userService.deleteCustomer(request.params.id);
-    if (result.message) {
-        response.status(404).json(result);
-        return;
-    }
-    response.status(204).send();
-}
-export default {
-    getCustomers,
-    getCustomer,
-    createCustomer,
-    updateCustomer,
-    deleteCustomer,
 };
+const getCustomer = async (request, response, next) => {
+    try {
+        response.json(await userService.getCustomer(request.params.id));
+    }
+    catch (error) {
+        next(error);
+    }
+};
+const createCustomer = async (request, response, next) => {
+    try {
+        response.status(201).json(await userService.createCustomer(request.body));
+    }
+    catch (error) {
+        next(error);
+    }
+};
+const updateCustomer = async (request, response, next) => {
+    try {
+        response.json(await userService.updateCustomer(request.params.id, request.body));
+    }
+    catch (error) {
+        next(error);
+    }
+};
+const deleteCustomer = async (request, response, next) => {
+    try {
+        await userService.deleteCustomer(request.params.id);
+        response.status(204).send();
+    }
+    catch (error) {
+        next(error);
+    }
+};
+export default { getCustomers, getCustomer, createCustomer, updateCustomer, deleteCustomer };
 //# sourceMappingURL=user.controller.js.map
