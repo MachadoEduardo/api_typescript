@@ -1,23 +1,15 @@
+import { type IUserRepository } from "../repositories/user.repository.js";
 import type { IUser } from "../types.js";
-declare function getCustomers(): IUser[];
-declare function getCustomer(id: string): IUser | {
-    message: string;
-};
-declare function createCustomer(data: unknown): IUser | {
-    message: string;
-};
-declare function updateCustomer(id: string, data: Partial<IUser>): IUser | {
-    message: string;
-};
-declare function deleteCustomer(id: string): {
-    message: string;
-};
-declare const _default: {
-    getCustomers: typeof getCustomers;
-    getCustomer: typeof getCustomer;
-    createCustomer: typeof createCustomer;
-    updateCustomer: typeof updateCustomer;
-    deleteCustomer: typeof deleteCustomer;
-};
+import type { UpdateUserBody } from "../types/http.types.js";
+export declare class UserService {
+    private readonly userRepository;
+    constructor(userRepository: IUserRepository);
+    getCustomers(): Promise<IUser[]>;
+    getCustomer(id: string): Promise<IUser>;
+    createCustomer(data: unknown): Promise<IUser>;
+    updateCustomer(id: string, data: UpdateUserBody): Promise<IUser>;
+    deleteCustomer(id: string): Promise<void>;
+}
+declare const _default: UserService;
 export default _default;
 //# sourceMappingURL=user.service.d.ts.map

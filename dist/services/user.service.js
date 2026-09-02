@@ -1,56 +1,49 @@
-import { users } from "../models/user.js";
+import { AppError } from "../errors/app-error.js";
+import { UserRepository } from "../repositories/user.repository.js";
 function isUser(value) {
     if (typeof value !== "object" || value === null)
         return false;
     const user = value;
-    return (typeof user.id === "number" &&
-        typeof user.name === "string" &&
-        typeof user.email === "string");
+    return typeof user.id === "number" && typeof user.name === "string" && typeof user.email === "string";
 }
-function getCustomers() {
-    return users;
-}
-function getCustomer(id) {
-    const user = users.find((item) => item.id === Number(id));
-    if (!user) {
-        return { message: "Usuário não encontrado" };
+export class UserService {
+    userRepository;
+    constructor(userRepository) {
+        this.userRepository = userRepository;
     }
-    return user;
-}
-function createCustomer(data) {
-    if (!isUser(data)) {
-        return { message: "O corpo deve conter id (number), name (string) e email (string)" };
+    async getCustomers() {
+        return this.userRepository.findAll();
     }
-    users.push(data);
-    return data;
-}
-function updateCustomer(id, data) {
-    const user = users.find((item) => item.id === Number(id));
-    if (!user) {
-        return { message: "Usuário não encontrado" };
+    async getCustomer(id) {
+        const user = await this.userRepository.findById(Number(id));
+        if (!user)
+            throw new AppError("Usuário não encontrado", 404);
+        return user;
     }
-    const { name, email } = data;
-    if ((name !== undefined && typeof name !== "string") ||
-        (email !== undefined && typeof email !== "string") ||
-        (name === undefined && email === undefined)) {
-        return { message: "Informe name e/ou email como texto" };
+    async createCustomer(data) {
+        if (!isUser(data)) {
+            throw new AppError("O corpo deve conter id (number), name (string) e email (string)", 400);
+        }
+        return this.userRepository.create(data);
     }
-    Object.assign(user, { name, email });
-    return user;
-}
-function deleteCustomer(id) {
-    const index = users.findIndex((item) => item.id === Number(id));
-    if (index === -1) {
-        return { message: "Usuário não encontrado" };
+    async updateCustomer(id, data) {
+        const { name, email } = data;
+        if ((name !== undefined && typeof name !== "string") ||
+            (email !== undefined && typeof email !== "string") ||
+            (name === undefined && email === undefined)) {
+            throw new AppError("Informe name e/ou email como texto", 400);
+        }
+        const user = await this.userRepository.update(Number(id), data);
+        if (!user)
+            throw new AppError("Usuário não encontrado", 404);
+        return user;
     }
-    users.splice(index, 1);
-    return { message: "Usuário deletado com sucesso" };
+    async deleteCustomer(id) {
+        const deleted = await this.userRepository.delete(Number(id));
+        if (!deleted)
+            throw new AppError("Usuário não encontrado", 404);
+    }
 }
-export default {
-    getCustomers,
-    getCustomer,
-    createCustomer,
-    updateCustomer,
-    deleteCustomer,
-};
+const userRepository = new UserRepository();
+export default new UserService(userRepository);
 //# sourceMappingURL=user.service.js.map

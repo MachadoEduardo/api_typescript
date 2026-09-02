@@ -1,27 +1,12 @@
-import type { Request, Response } from "express";
+import type { RequestHandler } from "express";
 import type { IUser } from "../types.js";
-interface UserParams {
-    id: string;
-}
-type UserResponse = IUser | {
-    message: string;
-};
-type UsersResponse = IUser[] | {
-    message: string;
-};
-declare function getCustomers(_request: Request, response: Response<UsersResponse>): void;
-declare function getCustomer(request: Request<UserParams>, response: Response<UserResponse>): void;
-declare function createCustomer(request: Request<Record<string, never>, UserResponse, unknown>, response: Response<UserResponse>): void;
-declare function updateCustomer(request: Request<UserParams, UserResponse, Partial<IUser>>, response: Response<UserResponse>): void;
-declare function deleteCustomer(request: Request<UserParams>, response: Response<{
-    message: string;
-}>): void;
+import type { EmptyBody, EmptyParams, EmptyQuery, IdParams } from "../types/http.types.js";
 declare const _default: {
-    getCustomers: typeof getCustomers;
-    getCustomer: typeof getCustomer;
-    createCustomer: typeof createCustomer;
-    updateCustomer: typeof updateCustomer;
-    deleteCustomer: typeof deleteCustomer;
+    getCustomers: RequestHandler<EmptyParams, IUser[], EmptyBody, EmptyQuery, Record<string, any>>;
+    getCustomer: RequestHandler<IdParams, IUser, EmptyBody, EmptyQuery, Record<string, any>>;
+    createCustomer: RequestHandler<EmptyParams, IUser, IUser, EmptyQuery, Record<string, any>>;
+    updateCustomer: RequestHandler<IdParams, IUser, Partial<Pick<IUser, "name" | "email">>, EmptyQuery, Record<string, any>>;
+    deleteCustomer: RequestHandler<IdParams, void, EmptyBody, EmptyQuery, Record<string, any>>;
 };
 export default _default;
 //# sourceMappingURL=user.controller.d.ts.map
