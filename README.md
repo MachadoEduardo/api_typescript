@@ -8,3 +8,6 @@ R: Centralizar o tratamento de erros deixa a API mais padronizada e fácil de ma
 
 #### Diferença entre validação de tipo e regra de negócio:
 R: A validação de tipo verifica se o dado está no formato esperado, por exemplo, se idade é um número ou se email é uma string. Já a regra de negócio verifica se o valor faz sentido dentro das regras do sistema, por exemplo, exigir que a idade seja maior que 18 ou impedir o cadastro de um e-mail já existente.
+
+### Diferença entre Service e Repository
+Repository é responsável pelo acesso e manipulação dos dados. Ele faz operações como buscar, salvar, atualizar ou excluir informações no banco de dados. Service é responsável pelas regras de negócio da aplicação. Ele recebe uma solicitação, aplica validações e regras necessárias e, quando precisa acessar dados, utiliza o Repository.
